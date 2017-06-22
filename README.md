@@ -8,3 +8,5 @@ When using in your plugin, you will need to take several steps:
 * Determine how you load your classes, and replace the example plugin namespaces.
 * Replace the sample commands in [`cli/commands.php`](https://github.com/zao-web/cli-framework/blob/master/cli/commands.php) with your own.
 * Replace the sample methods in [`cli/actions.php`](https://github.com/zao-web/cli-framework/blob/master/cli/actions.php) with your own.
+
+The real magic of this framework can be found in [`cli/base.php`](https://github.com/zao-web/cli-framework/blob/master/cli/base.php). This provides some base wp-cli functionality which can be easily integrated to your commands. Examples of using many of those methods can be found in [`cli/actions.php`](https://github.com/zao-web/cli-framework/blob/master/cli/actions.php).
