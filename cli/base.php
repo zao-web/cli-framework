@@ -131,27 +131,27 @@ class Base {
 		return $this->progress_bar;
 	}
 
+	/**
+	 * Pauses execution temporarily, and clears WordPress internal object caches.
+	 *
+	 * In long-running scripts, the internal caches on `$wp_object_cache` and `$wpdb`
+	 * can grow to consume gigabytes of memory. Periodically calling this utility
+	 * can help with memory management.
+	 *
+	 * See WP_CLI\Utils\wp_clear_object_cache() (https://github.com/wp-cli/wp-cli/blob/master/php/utils-wp.php)
+	 *
+	 * @since  0.1.0
+	 *
+	 * @param  integer $sleep_time Amount of time to pause execution. Potentially help things cool down.
+	 *
+	 * @return void
+	 */
 	public static function stop_the_insanity( $sleep_time = 0 ) {
 		if ( $sleep_time ) {
 			sleep( $sleep_time );
 		}
 
-		global $wpdb, $wp_object_cache;
-
-		$wpdb->queries = array(); // or define( 'WP_IMPORTING', true );
-
-		if ( ! is_object( $wp_object_cache ) ) {
-			return;
-		}
-
-		$wp_object_cache->group_ops = array();
-		$wp_object_cache->stats = array();
-		$wp_object_cache->memcache_debug = array();
-		$wp_object_cache->cache = array();
-
-		if ( is_callable( $wp_object_cache, '__remoteset' ) ) {
-			$wp_object_cache->__remoteset(); // important
-		}
+		wp_clear_object_cache();
 	}
 
 	public function confirm( $question ) {
