@@ -21,7 +21,7 @@ class Commands {
 	public function is_post_author( $args, $assoc_args ) {
 		$cli = new Actions( $args, $assoc_args, self::$log_dir );
 		$cli->backup_log();
-		$cli->delete_log();
+		$cli->empty_log();
 		$cli->is_post_author();
 	}
 
@@ -29,16 +29,16 @@ class Commands {
 	public function delete_post_if_mine( $args, $assoc_args ) {
 		$cli = new Actions( $args, $assoc_args, self::$log_dir );
 		$cli->backup_log();
-		$cli->delete_log();
+		$cli->empty_log();
 		$cli->delete_post_if_mine();
 	}
 
 	/**
-	 * Delete the log
+	 * Empties the log
 	 */
-	public function delete_log( $args, $assoc_args ) {
+	public function empty_log( $args, $assoc_args ) {
 		$cli = new Base( $args, $assoc_args, self::$log_dir );
-		$cli->delete_log();
+		$cli->empty_log();
 	}
 
 	/**

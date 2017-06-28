@@ -10,7 +10,7 @@ class Actions extends Base {
 
 	public function is_post_author() {
 		if ( empty( $this->args[0] ) ) {
-			$this->error( 'Please provide the post ID to check.' );
+			$this->error_message( 'Please provide the post ID to check.' );
 		}
 
 		$this->disable_emails();
@@ -20,12 +20,12 @@ class Actions extends Base {
 
 		$is_post_author = $post && absint( $post->post_author ) === absint( $user_id );
 
-		$this->success_log( 'Can edit? ' . ( $is_post_author ? 'Yes' : 'No' ) );
+		$this->success_message( 'Can edit? ' . ( $is_post_author ? 'Yes' : 'No' ) );
 	}
 
 	public function delete_post_if_mine() {
 		if ( empty( $this->args[0] ) ) {
-			$this->error( 'Please provide the post ID to check.' );
+			$this->error_message( 'Please provide the post ID to check.' );
 		}
 
 		$this->disable_emails();
@@ -41,9 +41,9 @@ class Actions extends Base {
 		$is_post_author = isset( $post->post_author ) && absint( $post->post_author ) === $user_id;
 
 		if ( ! $is_post_author ) {
-			$this->error( sprintf( 'Sorry, post (%d) author does not match the user id (%d), and cannot be deleted.', $plan_id, $member->user_id ) );
+			$this->error_log( sprintf( 'Sorry, post (%d) author does not match the user id (%d), and cannot be deleted.', $plan_id, $member->user_id ) );
 		}
 
-		$this->success_log( 'Can edit? ' . ( $is_post_author ? 'Yes' : 'No' ) );
+		$this->success_message( 'Can edit? ' . ( $is_post_author ? 'Yes' : 'No' ) );
 	}
 }
