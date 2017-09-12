@@ -53,6 +53,13 @@ class Base {
 	protected static $log_file_name = 'cli-log.log';
 
 	/**
+	 * Full log file path/filename.
+	 *
+	 * @var string
+	 */
+	protected static $log_file = '';
+
+	/**
 	 * Whether to store CLI logs to the file system.
 	 *
 	 * @var string
@@ -243,7 +250,7 @@ class Base {
 			$this->check_log();
 
 			$msg .= $data ? ': ' . print_r( $data, true ) : '';
-			file_put_contents( $this->log_file, '[' . date( 'd-M-Y h:i:s A', current_time( 'timestamp' ) ) . '] ' . $msg . "\n", FILE_APPEND );
+			file_put_contents( self::$log_file, '[' . date( 'd-M-Y h:i:s A', current_time( 'timestamp' ) ) . '] ' . $msg . "\n", FILE_APPEND );
 		}
 
 		return $this;
@@ -258,7 +265,7 @@ class Base {
 	 */
 	public function empty_log() {
 		if ( self::$store_logs ) {
-			file_put_contents( $this->log_file, "\n" );
+			file_put_contents( self::$log_file, "\n" );
 			$this->success_message( 'Log emptied.' );
 		} else {
 			$this->error_message( 'Log storage disabled.' );
@@ -301,7 +308,7 @@ class Base {
 		if ( self::$store_logs ) {
 			$this->check_log();
 
-			$file = $this->log_file;
+			$file = self::$log_file;
 			$count = 1;
 			while ( file_exists( str_replace( '.log', '-' . $count . '.log', $file ) ) ) {
 				$count++;
@@ -332,8 +339,8 @@ class Base {
 				mkdir( self::$log_dir );
 			}
 
-			if ( ! file_exists( $this->log_file ) ) {
-				touch( $this->log_file );
+			if ( ! file_exists( self::$log_file ) ) {
+				touch( self::$log_file );
 			}
 		}
 
