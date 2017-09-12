@@ -156,8 +156,8 @@ final class Example_WP_CLI_Plugin {
 			Example_WP_CLI\CLI\Commands::set_log_dir( $this->path . 'logs' );
 
 			/*
-			 * To see commands, `wp naspd`.
-			 * Then, for more information on a specific command, 'wp help naspd <command>'.
+			 * To see commands, `wp example_wp_cli`.
+			 * Then, for more information on a specific command, 'wp help example_wp_cli <command>'.
 			 */
 			WP_CLI::add_command( 'example_wp_cli', 'Example_WP_CLI\\CLI\\Commands' );
 		}
