@@ -53,6 +53,13 @@ class Base {
 	protected static $log_file_name = 'cli-log.log';
 
 	/**
+	 * Whether to store CLI logs to the file system.
+	 *
+	 * @var string
+	 */
+	protected static $store_logs = true;
+
+	/**
 	 * Constructor
 	 *
 	 * @since 0.1.0
@@ -232,10 +239,12 @@ class Base {
 	 * @return Base for chaining.
 	 */
 	public function write_log( $msg, $data = null ) {
-		$this->check_log();
+		if ( self::$store_logs ) {
+			$this->check_log();
 
-		$msg .= $data ? ': ' . print_r( $data, true ) : '';
-		file_put_contents( $this->log_file, '[' . date( 'd-M-Y h:i:s A', current_time( 'timestamp' ) ) . '] ' . $msg . "\n", FILE_APPEND );
+			$msg .= $data ? ': ' . print_r( $data, true ) : '';
+			file_put_contents( $this->log_file, '[' . date( 'd-M-Y h:i:s A', current_time( 'timestamp' ) ) . '] ' . $msg . "\n", FILE_APPEND );
+		}
 
 		return $this;
 	}
@@ -248,8 +257,12 @@ class Base {
 	 * @return Base for chaining.
 	 */
 	public function empty_log() {
-		file_put_contents( $this->log_file, "\n" );
-		$this->success_message( 'Log emptied.' );
+		if ( self::$store_logs ) {
+			file_put_contents( $this->log_file, "\n" );
+			$this->success_message( 'Log emptied.' );
+		} else {
+			$this->error_message( 'Log storage disabled.' );
+		}
 
 		return $this;
 	}
@@ -262,13 +275,17 @@ class Base {
 	 * @return Base for chaining.
 	 */
 	public function delete_logs() {
-		$this->confirm( 'Are you sure you want to delete the logs?', $this->assoc_args );
+		if ( self::$store_logs ) {
+			$this->confirm( 'Are you sure you want to delete the logs?', $this->assoc_args );
 
-		foreach ( glob( self::$log_dir . '*.log' ) as $log_file ) {
-			unlink( $log_file );
+			foreach ( glob( self::$log_dir . '*.log' ) as $log_file ) {
+				unlink( $log_file );
+			}
+
+			$this->success_message( 'Logs deleted.' );
+		} else {
+			$this->error_message( 'Log storage disabled.' );
 		}
-
-		$this->success_message( 'Logs deleted.' );
 
 		return $this;
 	}
@@ -281,21 +298,23 @@ class Base {
 	 * @return Base for chaining.
 	 */
 	public function backup_log() {
-		$this->check_log();
+		if ( self::$store_logs ) {
+			$this->check_log();
 
-		$file = $this->log_file;
-		$count = 1;
-		while ( file_exists( str_replace( '.log', '-' . $count . '.log', $file ) ) ) {
-			$count++;
+			$file = $this->log_file;
+			$count = 1;
+			while ( file_exists( str_replace( '.log', '-' . $count . '.log', $file ) ) ) {
+				$count++;
+			}
+
+			$new_file = str_replace( '.log', '-' . $count . '.log', $file );
+
+			if ( ! copy( $file, $new_file ) ) {
+				WP_CLI::error( "Failed to copy {$new_file}..." );
+			}
+
+			$this->success_message( "Log backed up: {$new_file}" );
 		}
-
-		$new_file = str_replace( '.log', '-' . $count . '.log', $file );
-
-		if ( ! copy( $file, $new_file ) ) {
-			WP_CLI::error( "Failed to copy {$new_file}..." );
-		}
-
-		$this->success_message( "Log backed up: {$new_file}" );
 
 		return $this;
 	}
@@ -308,12 +327,14 @@ class Base {
 	 * @return Base for chaining.
 	 */
 	public function check_log() {
-		if ( ! file_exists( self::$log_dir ) ) {
-			mkdir( self::$log_dir );
-		}
+		if ( self::$store_logs ) {
+			if ( ! file_exists( self::$log_dir ) ) {
+				mkdir( self::$log_dir );
+			}
 
-		if ( ! file_exists( $this->log_file ) ) {
-			touch( $this->log_file );
+			if ( ! file_exists( $this->log_file ) ) {
+				touch( $this->log_file );
+			}
 		}
 
 		return $this;
@@ -451,6 +472,19 @@ class Base {
 		self::$log_file = self::$log_dir . self::$log_file_name;
 
 		return self::$log_file;
+	}
+
+	/**
+	 * Toggles whether to store CLI logs to the file system.
+	 *
+	 * @since  0.1.1
+	 *
+	 * @param  boolean $enabled Whether storing logs is enabled.
+	 *
+	 * @return void
+	 */
+	public static function stored_logs_enabled( $enabled = true ) {
+		self::$store_logs = (bool) $enabled;
 	}
 
 	/**
