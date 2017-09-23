@@ -391,7 +391,7 @@ class Base {
 			sleep( $sleep_time );
 		}
 
-		wp_clear_object_cache();
+		Utils\wp_clear_object_cache();
 	}
 
 	/**
