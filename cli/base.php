@@ -13,7 +13,7 @@ class Base {
 	 *
 	 * @var array
 	 */
-	public $args       = array();
+	public $args = array();
 
 	/**
 	 * Parameters passed to command.
@@ -250,6 +250,7 @@ class Base {
 			$this->check_log();
 
 			$msg .= $data ? ': ' . print_r( $data, true ) : '';
+			// Cannot use $wp_filesystem->put_contents() as it does not provide a way to APPEND content to a file.
 			file_put_contents( self::$log_file, '[' . date( 'd-M-Y h:i:s A', current_time( 'timestamp' ) ) . '] ' . $msg . "\n", FILE_APPEND );
 		}
 
@@ -265,7 +266,7 @@ class Base {
 	 */
 	public function empty_log() {
 		if ( self::$store_logs ) {
-			file_put_contents( self::$log_file, "\n" );
+			self::file_system()->put_contents( self::$log_file, "\n" );
 			$this->success_message( 'Log emptied.' );
 		} else {
 			$this->error_message( 'Log storage disabled.' );
@@ -286,7 +287,7 @@ class Base {
 			$this->confirm( 'Are you sure you want to delete the logs?', $this->assoc_args );
 
 			foreach ( glob( self::$log_dir . '*.log' ) as $log_file ) {
-				unlink( $log_file );
+				self::file_system()->delete( $log_file );
 			}
 
 			$this->success_message( 'Logs deleted.' );
@@ -335,12 +336,12 @@ class Base {
 	 */
 	public function check_log() {
 		if ( self::$store_logs ) {
-			if ( ! file_exists( self::$log_dir ) ) {
-				mkdir( self::$log_dir );
+			if ( ! self::file_system()->exists( self::$log_dir ) ) {
+				self::file_system()->mkdir( self::$log_dir );
 			}
 
-			if ( ! file_exists( self::$log_file ) ) {
-				touch( self::$log_file );
+			if ( ! self::file_system()->exists( self::$log_file ) ) {
+				self::file_system()->touch( self::$log_file );
 			}
 		}
 
@@ -492,6 +493,23 @@ class Base {
 	 */
 	public static function stored_logs_enabled( $enabled = true ) {
 		self::$store_logs = (bool) $enabled;
+	}
+
+	/**
+	 * Get the WordPress filesystem handler.
+	 *
+	 * @since  0.1.0
+	 *
+	 * @return WP_Filesystem_Base
+	 */
+	public static function file_system() {
+		global $wp_filesystem;
+
+		if ( ! is_object( $wp_filesystem ) ) {
+			WP_Filesystem();
+		}
+
+		return $wp_filesystem;
 	}
 
 	/**
