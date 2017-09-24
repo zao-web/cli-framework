@@ -362,9 +362,9 @@ class Base {
 	public function progress_bar( $param = 0, $action = 'Migrating', $items = 'Rows' ) {
 		if ( $param && is_numeric( $param ) ) {
 			$this->progress_bar = Utils\make_progress_bar( "$action $param $items", $param );
-		} elseif ( 'tick' == $param ) {
+		} elseif ( 'tick' === $param ) {
 			$this->progress_bar->tick();
-		} elseif ( 'finish' == $param ) {
+		} elseif ( 'finish' === $param ) {
 			$this->progress_bar->finish();
 		}
 
