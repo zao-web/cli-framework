@@ -4,7 +4,7 @@ use Exception;
 use WP_CLI;
 
 /**
- * Meal Planning Plugin Actions object
+ * CLI Actions
  */
 class Actions extends Base {
 
